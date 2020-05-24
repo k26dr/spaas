@@ -70,4 +70,5 @@ def get_device(code):
         device = cursor.fetchone()
         if device is None:
             raise ApplicationError("Device not found")
+    return device
 
