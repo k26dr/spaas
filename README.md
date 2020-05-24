@@ -1,6 +1,6 @@
 # API Documentation
 
-Base URL: `http://api.spaasmobility.com:3333`
+Base URL: `http://api.spaasmobility.com`
 
 All POST bodies are JSON.  All requests require the `Content-Type: application/json` header to be set.
 
