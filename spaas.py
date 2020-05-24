@@ -62,3 +62,12 @@ def login():
     return jsonify({ "access_token": token })
 
 app.run(host='0.0.0.0', port=3333)
+
+@app.route("/device/<code>", methods=["GET"])
+def get_device(code):
+    with conn, conn.cursor(cursor_factory=DictCursor) as cursor:
+        cursor.execute("SELECT * FROM devices WHERE code=%s", (code,))
+        device = cursor.fetchone()
+        if device is None:
+            raise ApplicationError("Device not found")
+
