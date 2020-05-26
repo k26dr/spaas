@@ -34,9 +34,17 @@ def register():
     if "email" not in request.json or "password" not in request.json:
         raise ApplicationError("email and password must be specified in request body")
     hashed = bcrypt.hashpw(request.json["password"].encode("utf-8"), bcrypt.gensalt(14))
-    with conn, conn.cursor() as cursor:
-        user_id = str(uuid.uuid4())
-        cursor.execute("INSERT INTO users (id, email, password) VALUES (%s, %s, %s)", (user_id, request.json["email"], hashed.decode("utf-8")))
+    first_name = request.json.get("first_name", None)
+    last_name = request.json.get("last_name", None)
+    try:
+        with conn, conn.cursor() as cursor:
+            user_id = str(uuid.uuid4())
+            cursor.execute(
+                "INSERT INTO users (id, email, first_name, last_name, password) VALUES (%s, %s, %s, %s, %s)", 
+                (user_id, request.json["email"], first_name, last_name, hashed.decode("utf-8"))
+            )
+    except psycopg2.errors.IntegrityError:
+        raise ApplicationError("Email is already registered")
     return { "user_id": user_id }
 
 @app.route("/login", methods=["POST"])

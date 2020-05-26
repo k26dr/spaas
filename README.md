@@ -11,7 +11,9 @@ POST /register
 
 {
     "email": "myemail@email.com",
-    "password": "passswroddd123"
+    "password": "passswroddd123",
+    "first_name": "Jake",
+    "last_name": "Plumber"
 }
 ```
    
