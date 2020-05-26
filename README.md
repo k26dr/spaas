@@ -10,7 +10,7 @@ All POST bodies are JSON.  All requests require the `Content-Type: application/j
 POST /register
 
 {
-    "username": "myemail@email.com",
+    "email": "myemail@email.com",
     "password": "passswroddd123"
 }
 ```
@@ -21,7 +21,7 @@ POST /register
 POST /login
 
 {
-    "username": "myemail@email.com",
+    "email": "myemail@email.com",
     "password": "passswroddd123"
 }
 ```
