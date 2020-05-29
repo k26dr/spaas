@@ -26,7 +26,7 @@ def handle_bad_request(e):
 
 @app.before_request
 def before_request_func():
-    if request.headers.get('Content-Type', None) != "application/json":
+    if request.method == "POST" and request.headers.get('Content-Type', None) != "application/json":
         raise ApplicationError("'Content-Type: application/json' header must be set")
 
 @app.route("/register", methods=["POST"])
@@ -69,14 +69,29 @@ def login():
 
     return jsonify({ "access_token": token })
 
-app.run(host='0.0.0.0', port=3333)
-
-@app.route("/device/<code>", methods=["GET"])
-def get_device(code):
+@app.route("/device/<code>", methods=["POST"])
+def add_device(code):
+    user_id = auth_user(request)
     with conn, conn.cursor(cursor_factory=DictCursor) as cursor:
-        cursor.execute("SELECT * FROM devices WHERE code=%s", (code,))
-        device = cursor.fetchone()
-        if device is None:
+        cursor.execute("UPDATE devices SET user_id=%s WHERE code=%s", (user_id, code,))
+        if cursor.rowcount != 1:
             raise ApplicationError("Device not found")
-    return device
+    return jsonify({ "success": True })
+
+@app.route("/devices", methods=["GET"])
+def get_devices():
+    user_id = auth_user(request)
+    with conn, conn.cursor(cursor_factory=DictCursor) as cursor:
+        cursor.execute("SELECT * FROM devices WHERE user_id=%s", (user_id,))
+        devices = cursor.fetchall()
+        devices = [dict(device) for device in devices]
+    return jsonify(devices)
+
+def auth_user(request):
+    access_token = request.headers.get('SPAAS-ACCESS-TOKEN')
+    payload = jwt.decode(access_token, os.environ["JWTKEY"], algorithms=['HS256'])
+    print(payload)
+    return payload['sub']
+
+app.run(host='0.0.0.0', port=3333)
 

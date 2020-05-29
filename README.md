@@ -2,7 +2,11 @@
 
 Base URL: `http://api.spaasmobility.com`
 
-All POST bodies are JSON.  All requests require the `Content-Type: application/json` header to be set.
+All POST bodies are JSON.  
+
+All requests require the `Content-Type: application/json` header to be set.
+
+All endpoints except `/register` and `/login` must include the `SPAAS-ACCESS-TOKEN` header set with an access token from `/login`
 
 ## Register
 
@@ -28,12 +32,16 @@ POST /login
 }
 ```
 
-## Devices
+## Add Device
 
-`GET /device/<code>`
+`POST /device/<code>`
 
 `code` is a 6 digit SPAAS device code found on the device. 
 
-The endpoint returns device information.
+## Get Devices
+
+`GET /devices`
+
+Returns all of a user's devices
 	
 
