@@ -1,0 +1,4 @@
+bcrypt
+Flask
+psycopg2
+pyjwt
