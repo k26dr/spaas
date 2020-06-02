@@ -1,0 +1,7 @@
+node_modules
+Pods
+package-lock.json
+Podfile.lock
+*.json
+android/app/build
+android/.gradle

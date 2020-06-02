@@ -1,0 +1,9 @@
+export const BACKGROUND_COLOR_BLACK_MAT = "#212121";
+export const TEXT_INPUT_SEPARATOR_COLOR = "#757575"
+export const SIGN_UP_TEXT_COLOR = "#F6F6F6"
+export const FORGET_PASSWORD_TEXT_COLOR = "#757575"
+export const WHITE_TEXT_COLOR = "#FFFFFF"
+export const LOCHINVAR_COLOR = "#268C82"
+export const RED_COLOR = "#f85443"
+export const ORANGE_COLOR = "#f88d29"
+export const YELLOW_COLOR = "#ffd633"
