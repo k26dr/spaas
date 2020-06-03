@@ -23,11 +23,12 @@ export default class unlockDevice extends React.Component {
     constructor(props) {
         super(props);
         this.requestCoarseLocationPermission();
-        console.log(props)
         this.state = {
             device: props
         }
         this.manager = new BleManager();
+        this.connectedDevice = null;
+        this.uart_listener = null;
     }
     render() {
         return (
@@ -47,27 +48,46 @@ export default class unlockDevice extends React.Component {
         );
     }
     async unlockBleDevice (e) {
+        const UART_SERVICE_UUID = "6e400001-b5a3-f393-e0a9-e50e24dcca9e";
+        const UART_TX_UUID = "6e400002-b5a3-f393-e0a9-e50e24dcca9e";
+        const UART_RX_UUID = "6e400003-b5a3-f393-e0a9-e50e24dcca9e";
+        const UNLOCK_PASSWORD = "wigglemelegs\n";
+
+        console.log("unlock triggered")
+
+        if (this.connectedDevice) {
+            // Send unlock message
+            const device = this.connectedDevice;
+            const message = Buffer.from(UNLOCK_PASSWORD, 'utf8').toString('base64');
+            const tx_char = await device.writeCharacteristicWithoutResponseForService(UART_SERVICE_UUID, UART_TX_UUID, message);
+            console.log("Sent TX: " + tx_char.value);
+            return;
+        }
+
+        setTimeout(() => {
+            console.log("stop device scan")
+            this.manager.stopDeviceScan();
+        }, 10000);
+
         this.manager.startDeviceScan(null, null, async (error, device) => {
             if (error) {
                 // Handle error (scanning will be stopped automatically)
                 return;
             }
-            if (device.id == this.state.device.ble_device_id) {
-                this.manager.stopDeviceScan()
 
-                const UART_SERVICE_UUID = "6e400001-b5a3-f393-e0a9-e50e24dcca9e";
-                const UART_TX_UUID = "6e400002-b5a3-f393-e0a9-e50e24dcca9e";
-                const UART_RX_UUID = "6e400003-b5a3-f393-e0a9-e50e24dcca9e";
-                const UNLOCK_PASSWORD = "wigglemelegs\n";
+            if (device.id == this.state.device.ble_device_id) {
+                console.log("found device")
+                this.manager.stopDeviceScan()
 
                 // Connect to device
                 await device.connect()
                     .then(device => device.discoverAllServicesAndCharacteristics() )
-                    .catch(console.error);
+                    .catch(console.log);
+                this.connectedDevice = device;
 
                 // Listen for response
-                device.monitorCharacteristicForService(UART_SERVICE_UUID, UART_RX_UUID, (error, ch) => {
-                    if (error) { console.error(error); return; }
+                this.uart_listener = device.monitorCharacteristicForService(UART_SERVICE_UUID, UART_RX_UUID, (error, ch) => {
+                    if (error) { console.log(error); return; }
                     const message = Buffer.from(ch.value, 'base64').toString('utf8');
                     console.log("RX: " + message);
                 });
@@ -102,5 +122,11 @@ export default class unlockDevice extends React.Component {
         } catch (err) {
             console.warn(err);
         }
+    }
+    async componentWillUnmount() {
+        if (this.uart_listener)
+            this.uart_listener.remove();
+        if (this.manager)
+            this.manager.destroy()
     }
 }
