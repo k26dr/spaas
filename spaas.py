@@ -36,12 +36,13 @@ def register():
     hashed = bcrypt.hashpw(request.json["password"].encode("utf-8"), bcrypt.gensalt(14))
     first_name = request.json.get("first_name", None)
     last_name = request.json.get("last_name", None)
+    email = request.json["email"].strip().lower()
     try:
         with conn, conn.cursor() as cursor:
             user_id = str(uuid.uuid4())
             cursor.execute(
                 "INSERT INTO users (id, email, first_name, last_name, password) VALUES (%s, %s, %s, %s, %s)", 
-                (user_id, request.json["email"].lower(), first_name, last_name, hashed.decode("utf-8"))
+                (user_id, email, first_name, last_name, hashed.decode("utf-8"))
             )
     except psycopg2.errors.IntegrityError:
         raise ApplicationError("Email is already registered")
@@ -52,7 +53,8 @@ def login():
     if "email" not in request.json or "password" not in request.json:
         raise ApplicationError("email and password must be specified in request body")
     with conn, conn.cursor(cursor_factory=DictCursor) as cursor:
-        cursor.execute("SELECT * FROM users WHERE email=%s", (request.json["email"].lower(),))
+        email = request.json["email"].strip().lower()
+        cursor.execute("SELECT * FROM users WHERE email=%s", (email,))
         user = cursor.fetchone()
         if user is None:
             raise ApplicationError("Bad username/password combo")
