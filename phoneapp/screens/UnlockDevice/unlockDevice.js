@@ -24,15 +24,68 @@ export default class unlockDevice extends React.Component {
         super(props);
         this.requestCoarseLocationPermission();
         this.state = {
-            device: props
+            device: props,
+            connected: 0 // 0=no, 1=yes, 2=failed
         }
         this.manager = new BleManager();
         this.connectedDevice = null;
         this.uart_listener = null;
+        this.stopscantimer = null;
+
+        this.manager.startDeviceScan(null, null, async (error, device) => {
+            const UART_SERVICE_UUID = "6e400001-b5a3-f393-e0a9-e50e24dcca9e";
+            const UART_RX_UUID = "6e400003-b5a3-f393-e0a9-e50e24dcca9e";
+            const UNLOCK_PASSWORD = "wigglemelegs\n";
+
+            if (error) {
+                // Handle error (scanning will be stopped automatically)
+                return;
+            }
+
+            if (device.id == this.state.device.ble_device_id) {
+                console.log("found device")
+                this.manager.stopDeviceScan()
+
+                // Connect to device
+                await device.connect()
+                    .then(device => device.discoverAllServicesAndCharacteristics() )
+                    .catch(console.log);
+                this.connectedDevice = device;
+                this.setState({ ...this.state, connected: 1 })
+
+                // Listen for response
+                this.uart_listener = device.monitorCharacteristicForService(UART_SERVICE_UUID, UART_RX_UUID, (error, ch) => {
+                    if (error) { console.log(error); return; }
+                    const message = Buffer.from(ch.value, 'base64').toString('utf8');
+                    console.log("RX: " + message);
+                });
+            }
+            return;
+        });
+
+        this.stopscantimer = setTimeout(() => {
+            console.log("stop device scan")
+            if (this.state.connected === 0)
+                this.setState({ ...this.state, connected: 2 })
+            this.manager.stopDeviceScan();
+        }, 5000);
+
+
+    }
+
+    connectedText() {
+        if (this.state.connected === 0) 
+            return "Connecting..."
+        else if (this.state.connected === 1) 
+            return "Connected" 
+        else if (this.state.connected === 2) 
+            return "Failed to connect. Go back and try again." 
     }
     render() {
         return (
             <View style={unlockDeviceStyle.container}>
+                <Text style={unlockDeviceStyle.connectedText}>{this.connectedText()}</Text>
+
                 <HMButton
                     title={"UNLOCK DEVICE"}
                     displayImage={false}
@@ -50,7 +103,6 @@ export default class unlockDevice extends React.Component {
     async unlockBleDevice (e) {
         const UART_SERVICE_UUID = "6e400001-b5a3-f393-e0a9-e50e24dcca9e";
         const UART_TX_UUID = "6e400002-b5a3-f393-e0a9-e50e24dcca9e";
-        const UART_RX_UUID = "6e400003-b5a3-f393-e0a9-e50e24dcca9e";
         const UNLOCK_PASSWORD = "wigglemelegs\n";
 
         console.log("unlock triggered")
@@ -63,42 +115,6 @@ export default class unlockDevice extends React.Component {
             console.log("Sent TX: " + tx_char.value);
             return;
         }
-
-        setTimeout(() => {
-            console.log("stop device scan")
-            this.manager.stopDeviceScan();
-        }, 10000);
-
-        this.manager.startDeviceScan(null, null, async (error, device) => {
-            if (error) {
-                // Handle error (scanning will be stopped automatically)
-                return;
-            }
-
-            if (device.id == this.state.device.ble_device_id) {
-                console.log("found device")
-                this.manager.stopDeviceScan()
-
-                // Connect to device
-                await device.connect()
-                    .then(device => device.discoverAllServicesAndCharacteristics() )
-                    .catch(console.log);
-                this.connectedDevice = device;
-
-                // Listen for response
-                this.uart_listener = device.monitorCharacteristicForService(UART_SERVICE_UUID, UART_RX_UUID, (error, ch) => {
-                    if (error) { console.log(error); return; }
-                    const message = Buffer.from(ch.value, 'base64').toString('utf8');
-                    console.log("RX: " + message);
-                });
-
-                // Send unlock message
-                const message = Buffer.from(UNLOCK_PASSWORD, 'utf8').toString('base64');
-                const tx_char = await device.writeCharacteristicWithoutResponseForService(UART_SERVICE_UUID, UART_TX_UUID, message);
-                console.log("Sent TX: " + tx_char.value);
-            }
-            return;
-        });
 
     }
     async requestCoarseLocationPermission() {
@@ -124,6 +140,8 @@ export default class unlockDevice extends React.Component {
         }
     }
     async componentWillUnmount() {
+        if (this.stopscantimer)
+            clearTimeout(this.stopscantimer);
         if (this.uart_listener)
             this.uart_listener.remove();
         if (this.manager)

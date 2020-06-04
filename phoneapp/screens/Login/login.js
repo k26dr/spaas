@@ -62,7 +62,8 @@ export default class login extends React.Component {
                   password: this.state.password
                 }),
                 headers: {
-                  'Content-Type': 'application/json'
+                  'Content-Type': 'application/json',
+                  'Accept': 'application/json'
                 }
               }
               let resp= fetch('http://api.spaasmobility.com/login', data)

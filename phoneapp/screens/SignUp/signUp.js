@@ -52,7 +52,8 @@ async api_call(){
               password: this.state.password
             }),
             headers: {
-              'Content-Type': 'application/json'
+              'Content-Type': 'application/json',
+              'Accept': 'application/json'
             }
           }
           let resp= fetch('http://api.spaasmobility.com/register', data)

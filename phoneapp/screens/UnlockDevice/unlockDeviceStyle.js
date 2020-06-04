@@ -8,4 +8,9 @@ export const unlockDeviceStyle = StyleSheet.create({
         backgroundColor: BACKGROUND_COLOR_BLACK_MAT,
         justifyContent: "center",
     },
+    connectedText: {
+        color: "white",
+        fontSize: 18,
+        textAlign: 'center'
+    }
 });
