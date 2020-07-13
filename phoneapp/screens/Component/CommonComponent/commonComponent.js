@@ -15,7 +15,7 @@ import {
     Text,
 } from 'react-native';
 import { HMTextInputStyle } from "./commonComponentStyle";
-import { IMG_USER, IMG_EYE_SHOW, IMG_ARROW, IMG_RADIO_BUTTON_SELECTED } from '../../../assets/image/imgConst';
+import { IMG_USER, IMG_ARROW, IMG_RADIO_BUTTON_SELECTED } from '../../../assets/image/imgConst';
 
 export const HMTextInput = (props) => {
     return (
@@ -31,8 +31,9 @@ export const HMTextInput = (props) => {
                     placeholder={props.placeholder || ""}
                     onChangeText={props.onChangeText} />
 
-                {props.secureText && <TouchableOpacity>
-                    <Image style={HMTextInputStyle.emailLogoStyle} resizeMode="contain" source={IMG_EYE_SHOW} />
+                {props.rightImage && <TouchableOpacity 
+                onPress={props.onPress}>
+                    <Image style={HMTextInputStyle.emailLogoStyle} resizeMode="contain" source={props.rightImage} />
                 </TouchableOpacity>}
             </View>
             <View style={HMTextInputStyle.separatorStyle} />

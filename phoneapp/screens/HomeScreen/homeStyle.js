@@ -76,9 +76,7 @@ export const homeStyle = StyleSheet.create({
         marginRight: 20,
     },
     logo: {
-        alignSelf: "center",
-        height: 60,
-        width: 60,
+        alignSelf: "center"
     },
     container: {
         top: 0,

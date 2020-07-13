@@ -69,15 +69,6 @@ export default class addDevices extends React.Component {
           alert("Something went wrong");
         }
       }
-    add_device_local_storage(responseJson){
-        global.DEVICE_LIST.push({
-            ble_device_id: responseJson.ble_device_id,
-            display_name: responseJson.display_name,
-            device_type: responseJson.device_type,
-            code: responseJson.code,
-        });
-        Actions.home();
-    }
     render() {
         //this.getToken();
         return (

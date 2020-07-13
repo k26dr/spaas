@@ -18,7 +18,7 @@ import {
     StatusBar,
     TouchableOpacity,
 } from 'react-native';
-import { IMG_LOGO, IMG_FB, IMG_ARROW, IMG_AT_SYMBOL, IMG_LOCK, IMG_EYE_SHOW } from '../../assets/image/imgConst';
+import { IMG_LOGO, IMG_FB, IMG_ARROW, IMG_AT_SYMBOL, IMG_LOCK, IMG_EYE_SHOW,IMG_EYE_HIDE } from '../../assets/image/imgConst';
 import { loginStyle } from "./loginStyle";
 import { Actions,ActionConst } from 'react-native-router-flux';
 import { HMTextInput, HMButton } from '../Component/CommonComponent/commonComponent';
@@ -29,9 +29,9 @@ export default class login extends React.Component {
         super(props);
         this.state={
             username : "",
-            password : ""
+            password : "",
+            password_visibility:false
         };
-        global.DEVICE_LIST=[];
     }
     async storeToken(access_token) {
         try {
@@ -89,6 +89,9 @@ export default class login extends React.Component {
                         });;
         }
     }
+    showHidePassword(){        
+        this.setState({password_visibility : !this.state.password_visibility});        
+    }
     render() {
         return (
             <View style={loginStyle.container}>
@@ -107,10 +110,12 @@ export default class login extends React.Component {
                     <View style={loginStyle.passwordTextContainer}>
                         <HMTextInput
                             shouldDisplayLeftImage={true}
-                            secureText={true}
+                            secureText={!this.state.password_visibility}
                             placeholder={"Password"}
                             imageHolder={IMG_LOCK}
-                            onChangeText={(value)=>this.setState({password : value})} />
+                            onChangeText={(value)=>this.setState({password : value})}
+                            onPress={()=>this.showHidePassword()}
+                            rightImage={this.state.password_visibility? IMG_EYE_SHOW:IMG_EYE_HIDE} />
                     </View>
 
                     <View style={loginStyle.forgetPasswordContainer}>

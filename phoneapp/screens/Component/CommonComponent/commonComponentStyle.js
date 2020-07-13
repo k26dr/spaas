@@ -23,9 +23,7 @@ export const HMTextInputStyle = StyleSheet.create({
         marginRight: 20,
     },
     logo: {
-        alignSelf: "center",
-        height: 60,
-        width: 60,
+        alignSelf: "center"
     },
     container: {
         height: "100%",

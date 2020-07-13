@@ -25,7 +25,8 @@ export default class unlockDevice extends React.Component {
         this.requestCoarseLocationPermission();
         this.state = {
             device: props,
-            connected: 0 // 0=no, 1=yes, 2=failed
+            connected: 0, // 0=no, 1=yes, 2=failed
+            is_ble_device_id:false
         }
         this.manager = new BleManager();
         this.connectedDevice = null;
@@ -43,6 +44,7 @@ export default class unlockDevice extends React.Component {
             }
 
             if (device.id == this.state.device.ble_device_id) {
+                this.state.is_ble_device_id=true;
                 console.log("found device")
                 this.manager.stopDeviceScan()
 
@@ -59,6 +61,9 @@ export default class unlockDevice extends React.Component {
                     const message = Buffer.from(ch.value, 'base64').toString('utf8');
                     console.log("RX: " + message);
                 });
+            }
+            else{
+                this.state.is_ble_device_id=false;
             }
             return;
         });
@@ -84,12 +89,11 @@ export default class unlockDevice extends React.Component {
     render() {
         return (
             <View style={unlockDeviceStyle.container}>
-                <Text style={unlockDeviceStyle.connectedText}>{this.connectedText()}</Text>
-
+                <Text style={unlockDeviceStyle.connectedText}>{this.connectedText()}</Text>                
                 <HMButton
-                    title={"UNLOCK DEVICE"}
+                    title={this.state.is_ble_device_id?"TOGGLE LIGHT":"UNLOCK DEVICE"}
                     displayImage={false}
-                    onPress={this.unlockBleDevice.bind(this)}
+                    onPress={this.state.is_ble_device_id?Actions.pop():this.unlockBleDevice.bind(this)}
                 />
                 <HMButton
                     title={"FORGET DEVICE"}

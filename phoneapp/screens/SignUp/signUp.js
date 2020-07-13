@@ -15,7 +15,7 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import { signUpStyle } from "./signUpStyle";
-import { IMG_LOGO, IMG_AT_SYMBOL, IMG_LOCK, IMG_EYE_SHOW, IMG_ARROW, IMG_USER } from '../../assets/image/imgConst';
+import { IMG_LOGO, IMG_AT_SYMBOL, IMG_LOCK, IMG_EYE_SHOW,IMG_EYE_HIDE, IMG_ARROW, IMG_USER } from '../../assets/image/imgConst';
 import { Actions } from 'react-native-router-flux';
 import { HMTextInput, HMButton } from "../Component/CommonComponent/commonComponent";
 
@@ -26,7 +26,8 @@ export default class signup extends React.Component {
         firstname : "",
         lastname : "",
         email : "",
-        password : ""
+        password : "",
+        password_visibility:false
     };
   }
 validate_data(){
@@ -63,7 +64,7 @@ async api_call(){
                         //alert('response:' + responseJson.access_token);
                         try{
                             //AsyncStorage.setItem('IsLogin',true);
-                            Actions.home();
+                            Actions.login();
                         } catch (error) {
                             // Error saving data
                         }
@@ -76,6 +77,9 @@ async api_call(){
                         alert(error);
                     });;
     }
+  }
+  showHidePassword(){
+    this.setState({password_visibility : !this.state.password_visibility});
   }
   render() {
     return (
@@ -111,10 +115,12 @@ async api_call(){
           <View style={signUpStyle.textInputContainer}>
             <HMTextInput
               shouldDisplayLeftImage={true}
-              secureText={true}
+              secureText={!this.state.password_visibility}
               placeholder={"Password"}
               imageHolder={IMG_LOCK}
-              onChangeText={(value)=>this.setState({password : value})}/>
+              onChangeText={(value)=>this.setState({password : value})}
+              onPress={()=>this.showHidePassword()}
+              rightImage={this.state.password_visibility? IMG_EYE_SHOW:IMG_EYE_HIDE}/>
           </View>
 
           <HMButton title={"SIGN UP"} displayImage={true}
