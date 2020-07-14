@@ -66,7 +66,7 @@ export default class login extends React.Component {
                   'Accept': 'application/json'
                 }
               }
-              let resp= fetch('http://api.spaasmobility.com/login', data)
+              let resp= fetch('https://api.spaasmobility.com/login', data)
                       .then(response => response.json())  // promise
                       .then((responseJson) => {
                         if(responseJson.access_token){

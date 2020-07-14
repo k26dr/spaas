@@ -41,7 +41,7 @@ export default class addDevices extends React.Component {
                   'SPAAS-ACCESS-TOKEN':global.ACCESS_TOKEN
                 }
               }
-              let resp= fetch('http://api.spaasmobility.com/device/'+this.state.code, data)
+              let resp= fetch('https://api.spaasmobility.com/device/'+this.state.code, data)
                       .then(response => response.json())  // promise
                       .then((responseJson) => {
                         if(responseJson.success){

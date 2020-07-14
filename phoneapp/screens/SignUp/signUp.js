@@ -57,7 +57,7 @@ async api_call(){
               'Accept': 'application/json'
             }
           }
-          let resp= fetch('http://api.spaasmobility.com/register', data)
+          let resp= fetch('https://api.spaasmobility.com/register', data)
                   .then(response => response.json())  // promise
                   .then((responseJson) => {
                     if(responseJson.user_id){

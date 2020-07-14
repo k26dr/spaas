@@ -14,7 +14,7 @@ import {
     FlatList,
     TouchableOpacity,
 } from 'react-native';
-import { IMG_NUMBER1, IMG_ADD } from '../../assets/image/imgConst';
+import { IMG_ADD } from '../../assets/image/imgConst';
 import { homeStyle } from "./homeStyle";
 import { TEXT_INPUT_SEPARATOR_COLOR } from '../../assets/app-color';
 import { Actions } from 'react-native-router-flux';
@@ -36,7 +36,7 @@ export default class home extends React.Component {
                   'SPAAS-ACCESS-TOKEN':global.ACCESS_TOKEN
                 }
               }
-              let resp= fetch('http://api.spaasmobility.com/devices', data)
+              let resp= fetch('https://api.spaasmobility.com/devices', data)
                       .then(response => response.json())  // promise
                       .then((responseJson) => {
                         if(responseJson){
@@ -66,7 +66,6 @@ export default class home extends React.Component {
             >
                 <View style={homeStyle.listItemStyle}>
                     <Text style={homeStyle.itemTextStyle}>{item.display_name}</Text>
-                    <Image style={homeStyle.numberStyle} source={IMG_NUMBER1} />
                 </View>
                 <View style={homeStyle.separatorStyle}></View>
             </TouchableOpacity>
